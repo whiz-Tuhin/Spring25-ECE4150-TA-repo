@@ -3,8 +3,8 @@ import boto3
 from botocore.exceptions import ClientError
 
 REGION="us-east-1"
-USER_POOL_ID="us-east-2_oWLmg4l6p"
-CLIENT_ID="265k4n28pofr4umvcrk05uipse"
+USER_POOL_ID="us-east-1_SbeSpjvX7"
+CLIENT_ID="4bq5qotn1hmrlil7k760cmcqll"
 
 cognitoclient = boto3.client('cognito-idp', region_name=REGION)
                             
