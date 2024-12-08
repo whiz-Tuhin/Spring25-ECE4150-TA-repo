@@ -402,9 +402,137 @@ Sample output
 ```
 
 #### Step 3: Verification
-
 ```bash
 aws cognito-idp list-user-pools --max-results 10
 aws cognito-idp describe-user-pool --user-pool-id <UserPoolId> (NOTE -take this id from previous command)
 aws cognito-idp describe-user-pool-client --user-pool-id <UserPoolId> --client-id <AppClientId> (NOTE - take this id from previous command)
+```
+
+### Create IAM Roles
+
+#### Step 1: Create a new IAM role called ‘lambda_photogallery_role’ for Lambda service, as shown below. Attach policy called AmazonDynamoDBFullAccess to this role. Then attach policy called AmazonCognitoPowerUser to this role.
+
+```bash
+aws iam create-role \
+    --role-name lambda_photogallery_role \
+    --assume-role-policy-document '{
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": "lambda.amazonaws.com"
+                },
+                "Action": "sts:AssumeRole"
+            }
+        ]
+    }'
+```
+
+Sample output
+```json
+{
+    "Role": {
+        "Path": "/",
+        "RoleName": "lambda_photogallery_role",
+        "RoleId": "AROAQZFG4VYBQHAK653MA",
+        "Arn": "arn:aws:iam::054037097987:role/lambda_photogallery_role",
+        "CreateDate": "2024-12-08T21:15:42Z",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "lambda.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        }
+    }
+}
+```
+#### Step 2:  Attach the AmazonDynamoDBFullAccess Policy
+```bash
+aws iam attach-role-policy \
+    --role-name lambda_photogallery_role \
+    --policy-arn arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+```
+
+#### Step 3: Attach the AmazonCognitoPowerUser Policy
+```bash
+aws iam attach-role-policy \
+    --role-name lambda_photogallery_role \
+    --policy-arn arn:aws:iam::aws:policy/AmazonCognitoPowerUser
+```
+
+#### Step 4: Verify the Role and Policies
+```bash
+aws iam get-role --role-name lambda_photogallery_role (role details)
+aws iam list-attached-role-policies --role-name lambda_photogallery_role (attached policies)
+```
+
+
+#### Step 5: Create another IAM role called ‘apiS3PutGet-Role’ to upload the photos to the S3 Bucket service, as shown below. Attach policy called AmazonAPIGatewayPushToCloudWatchLogs to this role. Then attach policy called AmazonS3FullAccess to this role.
+
+```bash
+aws iam create-role \
+    --role-name apiS3PutGet-Role \
+    --assume-role-policy-document '{
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": "apigateway.amazonaws.com"
+                },
+                "Action": "sts:AssumeRole"
+            }
+        ]
+    }'
+```
+Sample output
+```json
+{
+    "Role": {
+        "Path": "/",
+        "RoleName": "apiS3PutGet-Role",
+        "RoleId": "AROAQZFG4VYBRNDVKAIVL",
+        "Arn": "arn:aws:iam::054037097987:role/apiS3PutGet-Role",
+        "CreateDate": "2024-12-08T21:22:01Z",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "apigateway.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        }
+    }
+}
+```
+
+#### Step 6: Attach the AmazonAPIGatewayPushToCloudWatchLogs Policy
+```bash
+aws iam attach-role-policy \
+    --role-name apiS3PutGet-Role \
+    --policy-arn arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+```
+
+#### Step 7: Attach the AmazonS3FullAccess Policy
+```bash
+aws iam attach-role-policy \
+    --role-name apiS3PutGet-Role \
+    --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
+```
+
+#### Step 8: Verify Creation
+```bash
+aws iam get-role --role-name apiS3PutGet-Role
+aws iam list-attached-role-policies --role-name apiS3PutGet-Role
 ```
