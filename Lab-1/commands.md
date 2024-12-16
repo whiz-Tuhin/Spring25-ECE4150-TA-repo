@@ -927,3 +927,40 @@ Sample output:
     "lastUpdatedDate": "2024-12-09T08:44:28-05:00"
 }
 ```
+
+
+##### Upload staticwebsite files to S3 bucket
+```bash
+aws s3 sync "<LOCAL_PATH_TO_STATIC_WEBSITE>" s3://staticwebsite-choephel-2024-4150/ --region us-east-1 --force
+```
+
+##### Enable Static Website hosting for the S3 bucket, and serve default index.html
+```bash
+aws s3 website s3://staticwebsite-choephel-2024-4150/ --index-document index.html
+```
+
+##### Add Public access policy to the S3 bucket
+```bash
+echo '{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicReadGetObject",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::staticwebsite-choephel-2024-4150/*"
+    }
+  ]
+}' > policy_s3.json
+```
+
+```bash
+aws s3api put-bucket-policy --bucket staticwebsite-choephel-2024-4150 --policy file://policy_s3.json
+```
+
+
+
+
+
+
