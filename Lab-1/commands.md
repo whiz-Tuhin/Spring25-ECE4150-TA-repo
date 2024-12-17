@@ -547,24 +547,24 @@ aws apigateway create-rest-api --name "PhotoGalleryAPI" --description "REST API 
 Sample output
 ```json
 {
-"id": "r3jtubrv5f",
-"name": "PhotoGalleryAPI",
-"description": "REST API for Photo Gallery App",
-"createdDate": "2024-12-09T07:04:31-05:00",
-"apiKeySource": "HEADER",
-"endpointConfiguration": {
-"types": [
-"EDGE"
-]
-},
-"disableExecuteApiEndpoint": false,
-"rootResourceId": "cuixa2oc76"
+    "id": "sriy1wc7s5",
+    "name": "PhotoGalleryAPI",
+    "description": "REST API for Photo Gallery App",
+    "createdDate": "2024-12-15T19:23:58-05:00",
+    "apiKeySource": "HEADER",
+    "endpointConfiguration": {
+        "types": [
+            "EDGE"
+        ]
+    },
+    "disableExecuteApiEndpoint": false,
+    "rootResourceId": "e56erqdip8"
 }
 ```
 
 Moving forward, replace these values in the command with the values obtained above.
-<api-id-generated-from-step-1> = id (eg, =r3jtubrv5f)
-<root-id-generated-from-step-1> = rootResourceId (eg, =cuixa2oc76)
+<api-id-generated-from-step-1> = id (eg, =sriy1wc7s5)
+<root-id-generated-from-step-1> = rootResourceId (eg, =e56erqdip8)
 
 #### Step 2: Create resource and method for /signup
 
@@ -578,14 +578,14 @@ This will return a <signup-resource-id-created>
 Sample output
 ```json
 {
-    "id": "8dlxbk",
-    "parentId": "cuixa2oc76",
+    "id": "o9fqty",
+    "parentId": "e56erqdip8",
     "pathPart": "signup",
     "path": "/signup"
 }
 ```
 
-<signup-resource-id-created> = id (eg, =8dlxbk )
+<signup-resource-id-created> = id (eg, =o9fqty )
 
 ##### Create HTTP Method on the resource
 ```bash
@@ -616,7 +616,7 @@ Sample output
     "uri": "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:054037097987:function:photogallery_signup/invocations",
     "passthroughBehavior": "WHEN_NO_MATCH",
     "timeoutInMillis": 29000,
-    "cacheNamespace": "ixgs6g",
+    "cacheNamespace": "o9fqty",
     "cacheKeyParameters": []
 }
 ```
@@ -747,7 +747,7 @@ aws apigateway put-method --rest-api-id <api-id-generated-from-step-1> --resourc
 
 ##### Integrate Lambda function with the API endpoint
 ```bash
-aws apigateway put-integration --rest-api-id <api-id-generated-from-step-1> --resource-id <upload-photo-resource-id-created> --http-method PUT --type AWS_PROXY --integration-http-method POST --uri "arn:aws:apigateway:us-east-1:s3:path/photobucket-corporan-2021-4813/photos/{object}" --region us-east-1
+aws apigateway put-integration --rest-api-id <api-id-generated-from-step-1> --resource-id <upload-photo-resource-id-created>  --http-method PUT --type AWS --integration-http-method POST --uri "arn:aws:apigateway:us-east-1:s3:path/photobucket-corporan-2021-4813/photos/{object}" --credentials arn:aws:iam::<account_number>:role/apiS3PutGet-Role --region us-east-1
 ```
 
 Replace <account-number>, <api-id-generated-from-step-1> and <upload-photo-resource-id-created> with their respective values.
@@ -795,13 +795,12 @@ aws apigateway update-rest-api --rest-api-id <api-id-generated-from-command-1> -
 Sample output:
 ```json
 {
-    "id": "r3jtubrv5f",
+    "id": "sriy1wc7s5",
     "name": "PhotoGalleryAPI",
     "description": "REST API for Photo Gallery App",
-    "createdDate": "2024-12-09T07:04:31-05:00",
+    "createdDate": "2024-12-15T19:23:58-05:00",
     "binaryMediaTypes": [
         "image/jpg",
-        "image/png",
         "image/jpeg"
     ],
     "apiKeySource": "HEADER",
@@ -812,7 +811,7 @@ Sample output:
     },
     "tags": {},
     "disableExecuteApiEndpoint": false,
-    "rootResourceId": "cuixa2oc76"
+    "rootResourceId": "e56erqdip8"
 }
 ```
 
@@ -852,7 +851,7 @@ Sample output:
 }
 ```
 
-##### C: Define the Method response:
+##### C: Define the Method response for OPTIONS:
 
 ```bash
 aws apigateway put-method-response --rest-api-id r3jtubrv5f --resource-id ixgs6g --http-method OPTIONS --status-code 200 --response-models '{\"application/json\": \"Empty\"}' --response-parameters '{\"method.response.header.Access-Control-Allow-Origin\": true, \"method.response.header.Access-Control-Allow-Headers\": true, \"method.response.header.Access-Control-Allow-Methods\": true}'--region us-east-1
@@ -873,9 +872,28 @@ Sample output:
 }
 ```
 
+##### D: Define the Method response for other HTTP Method:
 
+```bash
+aws apigateway put-method-response --rest-api-id r3jtubrv5f --resource-id <resource-id> --http-method <GET/POST/PUT> --status-code 200 --response-models '{\"application/json\": \"Empty\"}' --response-parameters '{\"method.response.header.Access-Control-Allow-Origin\": true, \"method.response.header.Access-Control-Allow-Headers\": true, \"method.response.header.Access-Control-Allow-Methods\": true}'--region us-east-1
+```
 
-##### D: Define the Integration response:
+Sample output:
+```json
+{
+    "statusCode": "200",
+    "responseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": true,
+        "method.response.header.Access-Control-Allow-Methods": true,
+        "method.response.header.Access-Control-Allow-Origin": true
+    },
+    "responseModels": {
+        "application/json": "Empty"
+    }
+}
+```
+
+##### E: Define the Integration response:
 
 <to-do>
 
@@ -917,13 +935,50 @@ aws apigateway create-stage \
 Sample output:
 ```json
 {
-    "deploymentId": "v4nxcd",
+    "deploymentId": "1d5s5s",
     "stageName": "dev",
     "cacheClusterEnabled": false,
     "cacheClusterStatus": "NOT_AVAILABLE",
     "methodSettings": {},
     "tracingEnabled": false,
-    "createdDate": "2024-12-09T08:44:28-05:00",
-    "lastUpdatedDate": "2024-12-09T08:44:28-05:00"
+    "createdDate": "2024-12-15T20:12:41-05:00",
+    "lastUpdatedDate": "2024-12-15T20:12:41-05:00"
 }
 ```
+
+
+##### Upload staticwebsite files to S3 bucket
+```bash
+aws s3 sync "<LOCAL_PATH_TO_STATIC_WEBSITE>" s3://staticwebsite-choephel-2024-4150/ --region us-east-1 --force
+```
+
+##### Enable Static Website hosting for the S3 bucket, and serve default index.html
+```bash
+aws s3 website s3://staticwebsite-choephel-2024-4150/ --index-document index.html
+```
+
+##### Add Public access policy to the S3 bucket
+```bash
+echo '{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicReadGetObject",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::staticwebsite-choephel-2024-4150/*"
+    }
+  ]
+}' > policy_s3.json
+```
+
+```bash
+aws s3api put-bucket-policy --bucket staticwebsite-choephel-2024-4150 --policy file://policy_s3.json
+```
+
+
+
+
+
+

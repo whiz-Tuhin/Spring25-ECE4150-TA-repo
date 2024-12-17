@@ -1,4 +1,4 @@
-const API_URL = "https://cp6l62bxcc.execute-api.us-east-1.amazonaws.com/dev";
+const API_URL = "https://sriy1wc7s5.execute-api.us-east-1.amazonaws.com/dev";
 const PHOTOGALLERY_S3_BUCKET_URL = "photobucket-choephel-2024-4150-new";
 
 function clearSession() {
